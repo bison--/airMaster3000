@@ -1,10 +1,10 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-//-----Hardware Adressierung-----
-//Bei falscher Funktion bitte obere Zeile auskommentie-ren,
-//und untere Zeile freigeben
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-//LiquidCrystal_I2C lcd(0x3F,16,2);
+//-----Hardware Adressing-----
+//in case of an not-working LCD switch commenting those 2 lines
+//for a different default I2C address
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // default I2C address of an LCD
+//LiquidCrystal_I2C lcd(0x3F,16,2);  // the other default I2C address of an LCD
 
 #include "Adafruit_CCS811.h"
 Adafruit_CCS811 ccs;
@@ -24,6 +24,7 @@ uint8_t char_backslash_bytes[8] = {
     0b00000
 };
 
+// fire animation frame 1
 uint8_t char_fire1_bytes[8] = {
     0b10101,
     0b00100,
@@ -35,6 +36,7 @@ uint8_t char_fire1_bytes[8] = {
     0b11010
 };
 
+// fire animation frame 2
 uint8_t char_fire2_bytes[8] = {
     0b10100,
     0b00100,
@@ -68,9 +70,10 @@ int temperatureOffset = -20; // default: -25.0
 
 void setup()
 {
-  // initialize digital pin 13 as an output.
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
+  // initialize digital pin 13/LED_BUILTIN as an output.
+  // the build-in LED will be used to blink and indicate that the sensor is active
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 
   pinMode(led_pin_r, OUTPUT);
   pinMode(led_pin_g, OUTPUT);
@@ -79,8 +82,9 @@ void setup()
   //pinMode(backlightButton, INPUT);
   
   Serial.begin(9600);
-  Serial.println("starting airMaster");
+  Serial.println("starting airMaster 3000");
 
+  // upload the self-defined chars to the LCD
   lcd.init();
   lcd.createChar(0, char_backslash_bytes);
   lcd.createChar(1, char_fire1_bytes);
@@ -89,7 +93,7 @@ void setup()
   
   if(!ccs.begin())
   {
-    digitalWrite(13, HIGH);
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.println("Failed to start sensor! Please check your wiring.");
 
     doBacklight();
@@ -120,12 +124,16 @@ void setup()
 }
 
 void blinkStatus() {
+  // 1. blink the build-in LED to indicate it's still alive
+  // 2. animate a spinning thingi to indicate to the end user it's still alive
+  // 3. animate a fire to indicate to the end user that the sensor is still warming up
+  
   if (statusLed) {
     statusLed = false;
   } else {
     statusLed = true;
   }
-  digitalWrite(13, statusLed);
+  digitalWrite(LED_BUILTIN, statusLed);
   lcd.setCursor(15, 1);
 
   activityAnimationIndex++;
@@ -134,8 +142,10 @@ void blinkStatus() {
   }
   
   lcd.print(activityAnimation[activityAnimationIndex]);
-
+  
+  // set a bool that the warmup was completed since micros will overflow in 72 hours
   if (!warmUpComplete) {
+    // 20 min warmup time
     if (micros() < 1200000000) {
       lcd.setCursor(15, 0);
 
@@ -161,6 +171,8 @@ void printLcdLine(String msg, int rowIndex) {
   lcd.print(msg);
 }
 
+/*
+ * the scrollDisplay does NOT work as I thought it would
 void writeSentenceDelayed(String text, int rowIndex, int delayTime) {
   clearLine(rowIndex);
   lcd.setCursor(0, rowIndex);
@@ -174,16 +186,17 @@ void writeSentenceDelayed(String text, int rowIndex, int delayTime) {
   }
   //lcd.noAutoscroll();
 }
+*/
 
 void welcomeMessage() {
-    //String msg0 = "                ";
-    String msg1 = "Hello JujiBla   ";
+  //String msg0 = "                "; // display length sample
+    String msg1 = "Hello User      "; // future me: don't forget to change to JujiBla when updating
     String msg2 = "the sensor needs";
     String msg3 = "20m to warm up  ";
     String msg4 = "indicated by:   ";
     String msg5 = "enjoy the       ";
     String msg6 = "airMaster 3000  ";
-    String msg7 = "v1.1            ";
+    String msg7 = "v1.1.1          "; // software version, increment if changed
     
     printLcdLine(msg1, 0);
     delay(3000);
@@ -211,9 +224,10 @@ void welcomeMessage() {
 void setStatusLedCo2(int co2ppm)
 {
   /*
+   * the CO2 LED indicators from my bought CO2 sensor
    CO2
       : green
-   800: yellow
+   800: yellow/orange
   1200: red
   */
   
@@ -223,7 +237,9 @@ void setStatusLedCo2(int co2ppm)
   
   if (co2ppm <= 800) {
     analogWrite(led_pin_g, 10);
-  } else if (co2ppm <= 1800) { // 1200 orig
+  } else if (co2ppm <= 1800) {
+    // set to 1800 because my sensor is often a bit higher than the bought one
+    // since the LED I used is... not that good I can't mix colors very well, so I use blue instead of yellow/orange
     analogWrite(led_pin_b, 20);
   } else {
     analogWrite(led_pin_r, 20);
@@ -251,6 +267,7 @@ void setStatusLedTvoc(float tvocppb)
 }
 
 void doBacklight() {
+  // i trigger the backlight always when writing to the display, otherwise it sometimes went off
   if (backlightOn) {
     lcd.backlight();
   } else {
@@ -320,7 +337,7 @@ void loop()
     }
     else
     {
-      digitalWrite(13, HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
       Serial.println("ERROR!");
       doBacklight();
       lcd.clear();
