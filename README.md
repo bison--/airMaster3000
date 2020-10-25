@@ -7,6 +7,13 @@ This is my first ever finished and end-user ready microcontroller project ever, 
 To not spam the repo I might write a blogpost about the build process with more pictures (link will be HERE then).  
 Short tweet about the process: https://twitter.com/bison_42/status/1317786502701645824
 
+# Software
+
+I used the arduino IDE and these libraries (read more about that here: https://www.arduino.cc/en/Guide/Libraries)
+
+* LiquidCrystal 1.0.7 (build in) https://www.arduino.cc/en/Reference/LiquidCrystal
+* Adafruit_CCS811 1.0.3 https://github.com/adafruit/Adafruit_CCS811
+
 ## Parts
 
 I used (not exactly all those parts but equal): 
@@ -18,7 +25,7 @@ Joy-IT 2,6" LCD Display, 16x2 (with I2C) | https://joy-it.net/de/products/SBC-LC
 AZDelivery Nano V3.0 CH340 Chip, Ready Soldered Parent | https://www.amazon.de/AZDelivery-Nano-CH340-Soldered-Parent/dp/B0755S95F3/
 diymore Nano I/O Extension Sensor Shield Module for Arduino UNO R3 Nano V3.0 | https://www.amazon.de/gp/product/B07D5522B6
 Donau Elektronik KGB15 Euro Box Small, Black, 95 x 135 x 45 cm | https://www.amazon.de/gp/product/B005DRPCBW
-TRU COMPONENTS 1PU Kippschalter 250 V/AC 1.5 A 1 x Ein/Ein rastend 1 St. | https://www.conrad.de/de/p/tru-components-1pu-kippschalter-250-v-ac-1-5-a-1-x-ein-ein-rastend-1-st-1564808.html
+TRU COMPONENTS 1PU Toggle switch (Kippschalter) 250 V/AC 1.5 A 1 x Ein/Ein rastend 1 St. | https://www.conrad.de/de/p/tru-components-1pu-kippschalter-250-v-ac-1-5-a-1-x-ein-ein-rastend-1-st-1564808.html
 UNITEC 40621 Lustre Terminal 12 x 1.5-2.5 mm Pack of 10 | https://www.amazon.de/-/en/UNITEC-40621-Lustre-Terminal-1-5-2-5/dp/B007CWCQ74/
 AVERY Zweckform L6009-20 Nameplate Foil Labels (45.7 x 21.2 mm on DIN A4 | https://www.amazon.de/gp/product/B0002S4DIU
 random RGB-Led | ...
